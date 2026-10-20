@@ -65,6 +65,7 @@ jobs:
           fi
 
       - name: Wait for backend to be ready
+        id: backend
         run: |
           echo "Waiting for backend to be ready..."
           for i in $(seq 1 30); do
@@ -80,18 +81,30 @@ jobs:
           exit 1
 
       - name: Run DeepEval classify tests
+        # Run even if an earlier test step failed (the job still ends as failed),
+        # but only once setup succeeded and the backend is up.
+        if: ${{ !cancelled() && steps.backend.outcome == 'success' }}
         working-directory: deepeval-tests
         run: deepeval test run test_classify.py -v
 
       - name: Run DeepEval sentiment tests
+        # Run even if an earlier test step failed (the job still ends as failed),
+        # but only once setup succeeded and the backend is up.
+        if: ${{ !cancelled() && steps.backend.outcome == 'success' }}
         working-directory: deepeval-tests
         run: deepeval test run test_sentiment.py -v
 
       - name: Run DeepEval summarize tests
+        # Run even if an earlier test step failed (the job still ends as failed),
+        # but only once setup succeeded and the backend is up.
+        if: ${{ !cancelled() && steps.backend.outcome == 'success' }}
         working-directory: deepeval-tests
         run: deepeval test run test_summarize.py -v
 
       - name: Run DeepEval intent tests
+        # Run even if an earlier test step failed (the job still ends as failed),
+        # but only once setup succeeded and the backend is up.
+        if: ${{ !cancelled() && steps.backend.outcome == 'success' }}
         working-directory: deepeval-tests
         run: deepeval test run test_intent.py -v
 
